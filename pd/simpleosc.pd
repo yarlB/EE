@@ -1,0 +1,8 @@
+#N canvas 415 51 450 300 10;
+#X obj 141 76 osc~ 333;
+#X obj 84 133 outlet~;
+#X obj 73 59 r \$1-freq;
+#X obj 141 93 *~ 1;
+#X connect 0 0 3 0;
+#X connect 2 0 0 0;
+#X connect 3 0 1 0;

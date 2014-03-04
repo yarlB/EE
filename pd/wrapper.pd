@@ -1,0 +1,36 @@
+#N canvas 1 51 1009 537 10;
+#X declare -lib pdcontainer;
+#X declare -lib iemguts;
+#X obj 147 -64 loadbang;
+#X obj 147 -30 s index;
+#X obj 147 -47 \$0;
+#X obj 11 -74 namecanvas canv-\$0;
+#X obj 12 -57 receive wrap-\$0;
+#X obj 12 -33 list \$0;
+#X msg 362 -50 simpleosc;
+#X obj 391 -74 declare -lib pdcontainer;
+#X obj 263 -74 declare -lib iemguts;
+#X text 13 363 sound contient l'abstraction que l'on ouvre \, env contient
+les enveloppes.;
+#X obj 12 308 send load-\$0;
+#X obj 12 14 t b l;
+#X msg 122 31 \; canv-\$2 obj 100 400 pd sound-\$2 \; pd-sound-\$2
+obj 10 10 \$1 \$2 \; pd-sound-\$2 obj 10 100 *~ \; pd-sound-\$2 msg
+100 33 1 150 \; pd-sound-\$2 obj 20 50 line~ 0 \; pd-sound-\$2 obj
+10 130 send~ audio-\$2 \; pd-sound-\$2 obj 100 10 receive load-\$2
+\; pd-sound-\$2 obj 200 10 receive shut-\$2 \; pd-sound-\$2 msg 200
+33 0 150 \; pd-sound-\$2 connect 0 0 1 0 \; pd-sound-\$2 connect 1
+0 4 0 \; pd-sound-\$2 connect 5 0 2 0 \; pd-sound-\$2 connect 2 0 3
+0 \; pd-sound-\$2 connect 3 0 1 1 \; pd-sound-\$2 connect 6 0 7 0 \;
+pd-sound-\$2 connect 7 0 3 0 \; canv-\$2 obj 100 430 pd env-\$2 \;
+pd-env-\$2 obj 10 80 *~ 0.5 \; pd-env-\$2 obj 70 80 *~ 0 \; pd-env-\$2
+obj 50 350 throw~ audio \; pd-env-\$2 obj 50 50 receive~ audio-\$2
+\; pd-env-\$2 connect 0 0 2 0 \; pd-env-\$2 connect 3 0 0 0 \; pd-env-\$2
+connect 3 0 1 0 \;;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X connect 4 0 5 0;
+#X connect 5 0 11 0;
+#X connect 6 0 5 0;
+#X connect 11 0 10 0;
+#X connect 11 1 12 0;
