@@ -1,0 +1,33 @@
+#N canvas 123 128 797 580 10;
+#X obj 68 167 inlet~;
+#X obj 252 163 inlet~;
+#X obj 214 377 outlet~;
+#X msg 265 249 1 150;
+#X msg 309 259 0 150;
+#X obj 265 276 line~;
+#X msg 84 229 1 150;
+#X msg 131 235 0 150;
+#X obj 84 252 line~;
+#X obj 183 51 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 251 303 *~;
+#X obj 68 282 *~;
+#X obj 183 89 select 0 1;
+#X obj 183 -3 receive transition-groupe-\$1-effet-\$2-position-\$3
+;
+#X connect 0 0 11 0;
+#X connect 1 0 10 0;
+#X connect 3 0 5 0;
+#X connect 4 0 5 0;
+#X connect 5 0 10 1;
+#X connect 6 0 8 0;
+#X connect 7 0 8 0;
+#X connect 8 0 11 1;
+#X connect 9 0 12 0;
+#X connect 10 0 2 0;
+#X connect 11 0 2 0;
+#X connect 12 0 7 0;
+#X connect 12 0 3 0;
+#X connect 12 1 6 0;
+#X connect 12 1 4 0;
+#X connect 13 0 9 0;

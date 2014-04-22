@@ -1,0 +1,21 @@
+#N canvas 652 257 450 300 10;
+#X obj 20 110 *~;
+#X msg 110 43 1 150;
+#X obj 34 60 line~ 0;
+#X msg 233 43 0 150;
+#X text 21 181 \$1 : nom du patch wrappé;
+#X text 21 194 \$2 : \$0 du wrapper(pour référencer les variables
+du patch);
+#X text 20 209 \$3 : groupe auquel appartient le patch;
+#X text 19 242 squelette pour wrappé une abstraction.;
+#X obj 110 20 receive load-\$3;
+#X obj 20 37 \$1 \$3;
+#X obj 233 20 receive shut-\$3;
+#X obj 20 140 throw~ groupe-\$2;
+#X connect 0 0 11 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;
+#X connect 3 0 2 0;
+#X connect 8 0 1 0;
+#X connect 9 0 0 0;
+#X connect 10 0 3 0;

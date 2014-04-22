@@ -1,0 +1,43 @@
+#N canvas 1 51 1009 661 10;
+#X obj 103 -104 namecanvas effet-\$2-groupe-\$1;
+#X obj 105 363 send13~;
+#X obj 251 363 send13~;
+#X text 550 70 \$1 : nom du groupe;
+#X text 550 85 \$2 : nom du patch de l'effet;
+#X obj 272 102 \$3;
+#X obj -50 102 \$3;
+#X text 550 100 \$3 : pas le choix si on veut connecter \, on doit
+passer receive13~;
+#X obj -50 79 receive in-left-effet-\$2-groupe-\$1;
+#X obj 272 79 receive in-right-effet-\$2-groupe-\$1;
+#X obj 313 346 receive out-right-effet-\$2-groupe-\$1;
+#X text 551 125 \$4 : idem \, faut passer une abstraction qui permet
+d'effectuer une transition \, qui a besoin de paramètres :;
+#X obj 172 179 \$2;
+#X obj 172 119 \$4 \$1 \$2 haut;
+#X obj 172 346 \$4 \$1 \$2 bas;
+#X text 551 151 le nom du groupe \, le nom de l'effet ainsi que la
+postion (haut/bas);
+#X obj -126 346 receive out-left-effet-\$2-groupe-\$1;
+#X obj 180 7 symbol left;
+#X obj 180 33 send active-effet-\$2-groupe-\$1-haut;
+#X obj 180 -71 receive get-active-effet-\$2-groupe-\$1-haut;
+#X obj 130 455 symbol left;
+#X obj 130 387 receive get-active-effet-\$2-groupe-\$1-bas;
+#X obj 130 481 send active-effet-\$2-groupe-\$1-bas;
+#X obj 537 -6 expr;
+#X obj 408 -37 expr if ($s1 == left \, right \, left);
+#X connect 5 0 13 1;
+#X connect 6 0 13 0;
+#X connect 8 0 6 0;
+#X connect 9 0 5 0;
+#X connect 10 0 2 0;
+#X connect 12 0 14 0;
+#X connect 13 0 12 0;
+#X connect 14 0 2 0;
+#X connect 14 0 1 0;
+#X connect 16 0 1 0;
+#X connect 17 0 18 0;
+#X connect 19 0 17 0;
+#X connect 20 0 22 0;
+#X connect 21 0 20 0;
