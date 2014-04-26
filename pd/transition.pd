@@ -1,4 +1,4 @@
-#N canvas 123 128 797 580 10;
+#N canvas 95 51 797 540 10;
 #X obj 68 167 inlet~;
 #X obj 252 163 inlet~;
 #X obj 214 377 outlet~;
@@ -13,8 +13,7 @@
 #X obj 251 303 *~;
 #X obj 68 282 *~;
 #X obj 183 89 select 0 1;
-#X obj 183 -3 receive transition-groupe-\$1-effet-\$2-position-\$3
-;
+#X obj 183 -3 receive transition-groupe-\$1-effet-\$2-\$3;
 #X connect 0 0 11 0;
 #X connect 1 0 10 0;
 #X connect 3 0 5 0;

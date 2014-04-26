@@ -1,6 +1,6 @@
-~playfile = {|name, dur, loop| "playfile " + name + ", " + dur + ", " + loop};
+Sonic.soninit;
 
-OSCFunc.new(\playfile, {|name, dur,loop| ~playfile.value(name,dur,loop)}, "/play/file");
+SynthDef.new(\playfile, {
 
+}).add;
 
-OSCFunc.new(\playsynth, {|name, dur, 
