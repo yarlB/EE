@@ -34,7 +34,6 @@ EE_Group_NoSpat : EE_Group {
   var m_one2four;
   var m_bufs;
 
-
   *new {
     arg name, server;
     ^super.new(name,server).eegnsInit(server);
@@ -55,7 +54,11 @@ EE_Group_NoSpat : EE_Group {
     super.free;
   }
 
-  addSynth {
+  isGrSpat {
+    ^false;
+  }
+
+  playSynth {
     arg synth, args;
     var allargs = [\bus, m_bus];
     if(args != nil,
@@ -64,12 +67,21 @@ EE_Group_NoSpat : EE_Group {
     ^Synth.new(synth, allargs, m_synths);
   }
 
-  addSound {
-    arg filename;
-    var buffer = Buffer.read(m_server, filename);
-    var args = [\i_bus, m_bus, \i_buf, buffer];
-    args.postln;
-    ^Synth.new(\playbuf, args, m_synths, doneAction: 2);
+  playSoundOnce {
+    arg filename,start,dur,kidargs,g;
+    var f = SoundFile.new(filename);
+    var s;
+    if(f.openRead) {
+      if (f.duration >= start) {
+	var b = Buffer.read(m_server,filename,f.sampleRate*start,f.sampleRate*dur,
+			    {s = Synth(\playFileOnce,[\i_bufnum,b] ++ kidargs,g);
+			    OSCFunc});
+      } {
+
+      }
+    } {
+
+    }
   }
 }
 
@@ -87,5 +99,9 @@ EE_Group_Spat : EE_Group {
 
   free {
     super.free;
+  }
+
+  isGrSpat {
+    ^true;
   }
 }
