@@ -1,61 +1,67 @@
 EE_Group {
-  var m_server;
+  classvar nb_outs = 4;
   var m_name;
   var m_g;
   var m_synths;
   var m_effects;
+  var m_bus;
 
   *new {
-    arg name, server;
-    ^super.new.eegInit(name, server);
-  }
-
-  eegInit {
-    arg name, server;
-    m_server = server;
-    m_name = name;
-    m_g = Group.new(server);
-    m_synths = ParGroup.new(m_g);
-    m_effects = Group.after(m_synths);
+    arg name, bus_nb;
+    ^super.new.eegInit(name, bus_nb);
   }
   
+  eegInit {
+    arg name, bus_nb;
+    m_name = name;
+    m_g = Group.new(Sonic.c_server);
+    m_synths = ParGroup.new(m_g);
+    m_effects = Group.after(m_synths);
+    m_bus = Bus.audio(Sonic.c_server, bus_nb);
+  }
+
   free {
     m_name.free;
     m_g.free;
     m_synths.free;
     m_effects.free;
+    m_bus.free;
     super.free;
   }
+  
+  playFileOnce {
+    arg file, start, dur, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileOnce, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
+  }
+
+  playFileThisTime {
+    arg file, start, dur, time, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileThisTime, [\i_time, time]);
+  }
+
+  playFileLoop {
+    arg file, start, dur, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileLoop);
+  }
+  
 }
 
 
 EE_Group_NoSpat : EE_Group {
-  var m_bus;
   var m_one2four;
-  var m_bufs;
 
   *new {
-    arg name, server;
-    ^super.new(name,server).eegnsInit(server);
+    arg name;
+    ^super.new(name,1).eegnsInit; //<-- 1 bus
   }
 
   eegnsInit {
-    arg server;
-    "Group_NoSpat : reservation du bus : ".post;
-    m_bus = Bus.audio(server, 1);
-    m_bus.postln;
-    m_one2four = Synth.after(m_effects, \one2four,[\bus, m_bus]);
-    m_bufs = [];
+    m_one2four = Synth.after(m_effects, \one2four,[\i_in,m_bus]);
   }
 
   free {
     m_one2four.free;
-    m_bus.free;
     super.free;
-  }
-
-  isGrSpat {
-    ^false;
   }
 
   playSynth {
@@ -66,42 +72,68 @@ EE_Group_NoSpat : EE_Group {
     allargs.postln;
     ^Synth.new(synth, allargs, m_synths);
   }
-
-  playSoundOnce {
-    arg filename,start,dur,kidargs,g;
-    var f = SoundFile.new(filename);
-    var s;
-    if(f.openRead) {
-      if (f.duration >= start) {
-	var b = Buffer.read(m_server,filename,f.sampleRate*start,f.sampleRate*dur,
-			    {s = Synth(\playFileOnce,[\i_bufnum,b] ++ kidargs,g);
-			    OSCFunc});
-      } {
-
-      }
-    } {
-
-    }
+  
+  playFile {
+    arg file, start, dur, s_name, s_synth, args = [];
+    var syn, buf;
+    buf = Buffer.read(Sonic.c_server, file.path, file.sampleRate * start, if(dur > 0,file.sampleRate * dur,-1),
+		      {syn = Synth(s_synth, [\i_bufnum, buf, \i_out, m_bus, \i_fad, Sonic.c_fading] ++ args, m_synths);
+			syn.onFree({buf.free; Sonic.c_synths.removeAt(s_name)});
+			Sonic.c_synths.put(s_name, syn);});		
+    file.close;
+    ^true;
   }
 }
 
 
 EE_Group_Spat : EE_Group {
+  var m_four2four;
+  
   *new {
-    arg name, server;
-    ^super.new(name,server).eegsInit(server);
+    arg name;
+    ^super.new(name,nb_outs).eegsInit; //<-- 4 bus
   }
-
-  *eegsInit {
-    arg server;
-    // m_bus = Bus.audio(server, 4);
+  
+  eegsInit {
+    m_four2four = Synth.after(m_effects, \four2four,[\i_in,m_bus]);
   }
-
+  
   free {
+    m_four2four.free;
     super.free;
   }
-
-  isGrSpat {
+  
+  playFile {
+    arg file, start, dur, s_name, s_synth, args = [];
+    var gr, syn, buf, bus, spat;
+    buf = Buffer.read(Sonic.c_server, file.path, file.sampleRate * start, if(dur > 0,file.sampleRate * dur, -1),
+		      {gr = Group.new(m_synths);
+			bus = Bus.audio(Sonic.c_server, nb_outs);
+			spat = Synth.new(\spat, [\i_in, bus, \i_out, m_bus], gr);
+			syn = Synth.before(spat, s_synth, [\i_bufnum, buf, \i_out, m_bus, \i_fad, Sonic.c_fading] ++ args);
+			syn.onFree({buf.free; Sonic.c_synths.removeAt(s_name); gr.free; bus.free});
+			Sonic.c_synths.put(s_name, gr);});
+    file.close;
     ^true;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
