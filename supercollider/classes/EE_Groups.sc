@@ -27,23 +27,7 @@ EE_Group {
     m_effects.free;
     m_bus.free;
     super.free;
-  }
-  
-  playFileOnce {
-    arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileOnce, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
-  }
-
-  playFileThisTime {
-    arg file, start, dur, time, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileThisTime, [\i_time, time]);
-  }
-
-  playFileLoop {
-    arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileLoop);
-  }
-  
+  }  
 }
 
 
@@ -83,6 +67,21 @@ EE_Group_NoSpat : EE_Group {
     file.close;
     ^true;
   }
+
+  playFileOnce {
+    arg file, start, dur, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileOnceMono, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
+  }
+
+  playFileThisTime {
+    arg file, start, dur, time, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileThisTimeMono, [\i_time, time]);
+  }
+
+  playFileLoop {
+    arg file, start, dur, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileLoopMono);
+  }
 }
 
 
@@ -115,6 +114,21 @@ EE_Group_Spat : EE_Group {
 			Sonic.c_synths.put(s_name, gr);});
     file.close;
     ^true;
+  }
+
+  playFileOnce {
+    arg file, start, dur, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileOnceQuad, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
+  }
+
+  playFileThisTime {
+    arg file, start, dur, time, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileThisTimeQuad, [\i_time, time]);
+  }
+
+  playFileLoop {
+    arg file, start, dur, s_name;
+    ^this.playFile(file, start, dur, s_name, \playFileLoopQuad);
   }
 }
 
