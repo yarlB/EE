@@ -81,7 +81,7 @@ EE_Group_NoSpat : EE_Group {
 
   playFileLoop {
     arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileLoopMono);
+    ^this.playFile(file, start, dur, s_name, \playFileLoopMono, []);
   }
 }
 
@@ -104,7 +104,7 @@ EE_Group_Spat : EE_Group {
   }
   
   playFile {
-    arg file, start, dur, s_name, s_synth, x, y;
+    arg file, start, dur, s_name, s_synth, args = [], x, y;
     var gr, syn, buf, bus, spat;
     buf = Buffer.read(Sonic.c_server, file.path, file.sampleRate * start, if(dur > 0,file.sampleRate * dur, -1),
 		      {gr = Group.new(m_synths);
@@ -118,18 +118,18 @@ EE_Group_Spat : EE_Group {
   }
 
   playFileOnce {
-    arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileOnceMono, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
+    arg file, start, dur, s_name, x, y;
+    ^this.playFile(file, start, dur, s_name, \playFileOnceMono, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]), x, y);
   }
 
   playFileThisTime {
-    arg file, start, dur, time, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileThisTimeMono, [\i_time, time]);
+    arg file, start, dur, time, s_name,x , y;
+    ^this.playFile(file, start, dur, s_name, \playFileThisTimeMono, [\i_time, time], x, y);
   }
 
   playFileLoop {
-    arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileLoopMono);
+    arg file, start, dur, s_name, x, y;
+    ^this.playFile(file, start, dur, s_name, \playFileLoopMono, [], x, y);
   }
 }
 

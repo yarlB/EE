@@ -28,7 +28,6 @@ Sonic {
     c_server.quit;
     c_groups.free;
     c_synths.free;
-    c_args.free;
     c_x_bus.free;
     c_y_bus.free;
     c_angle_bus.free;
