@@ -5,23 +5,33 @@ Sonic {
   classvar <c_synths;
   classvar <c_fading;
 
-  classvar <c_args;
+  classvar <c_x_bus;
+  classvar <c_y_bus;
+  classvar <c_angle_bus;
 
- *initClass {
-    c_groups = IdentityDictionary.new; //des IdentityDisctionary parce que plus rapides (comparaison physique)
-    c_synths = IdentityDictionary.new; //donc il faut faire attention et passer des symbols (asSymbol)
-    c_args = IdentityDictionary.new;
-    /*    c_args.put(\common, {|buf,bus| [\i_bufnum, buf, \i_out, bus , \i_fad, c_fading]});
-    c_args.put(\once, {|dur| if(dur > 0, [\i_bufdur, dur], [])});
-    c_args.put(\thisTime, {|time| [\i_time, time]});
-    c_args.put(\loop, []);*/
-  }
+  classvar <c_nb_outs = 4;
+    
 
   *sonInit {
     arg fad = 0.7;
     c_fading = fad;
     c_server = Server.local;
     c_server.boot;
+    c_groups = IdentityDictionary.new; //des IdentityDisctionary parce que plus rapides (comparaison physique)
+    c_synths = IdentityDictionary.new; //donc il faut faire attention et passer des symbols (asSymbol)
+    c_x_bus = Bus.control(c_server);
+    c_y_bus = Bus.control(c_server);
+    c_angle_bus = Bus.control(c_server);
+  }
+
+  *sonFree {
+    c_server.quit;
+    c_groups.free;
+    c_synths.free;
+    c_args.free;
+    c_x_bus.free;
+    c_y_bus.free;
+    c_angle_bus.free;
   }
 
   *addEEGroup {
@@ -78,23 +88,23 @@ Sonic {
   }
 
   *playFileThisTime {
-    arg name, filename, groupname, time, start, dur, to_spat;
-    ^this.playFile(name.asSymbol,filename, groupname.asSymbol, start, dur, to_spat, {|a,f| a.playFileThisTime(f, start, dur, time, name.asSymbol)});
+    arg name, filename, groupname, time, start = 0, dur = -1, to_spat = false, x, y;
+    ^this.playFile(name.asSymbol,filename.asString, groupname.asSymbol, start, dur, to_spat.asBoolean, {|a,f| a.playFileThisTime(f, start, dur, time, name.asSymbol, x, y)});
   }
 
   *playFileOnce {
-    arg name, filename, groupname, start, dur, to_spat;
-    ^this.playFile(name.asSymbol,filename, groupname.asSymbol, start, dur, to_spat, {|a,f| a.playFileOnce(f, start, dur, name.asSymbol)});
+    arg name, filename, groupname, start = 0, dur = -1, to_spat = false, x, y;
+    ^this.playFile(name.asSymbol,filename.asString, groupname.asSymbol, start, dur, to_spat.asBoolean, {|a,f| a.playFileOnce(f, start, dur, name.asSymbol, x, y)});
   }
 
   *playFileLoop {
-    arg name, filename, groupname, start, dur, to_spat;
-    ^this.playFile(name.asSymbol,filename, groupname.asSymbol, start, dur, to_spat, {|a,f| a.playFileLoop(f, start, dur, name.asSymbol)});
+    arg name, filename, groupname, start = 0, dur = -1, to_spat = false, x, y;
+    ^this.playFile(name.asSymbol,filename.asString, groupname.asSymbol, start, dur, to_spat.asBoolean, {|a,f| a.playFileLoop(f, start, dur, name.asSymbol, x, y)});
   }
 
   //joue la synth 'synth' dans le groupe 'groupname'
   *playSynth {
-    arg name, synth, groupname, to_spat, args = [];
+    arg name, synth, groupname, to_spat = false, args = [];
     var s_name = name.asSymbol, s_groupname = groupname.asSymbol, g, s;
     g = prepareForPlay(s_name,s_groupname,to_spat);
     if(g == false) {^false};
@@ -103,10 +113,21 @@ Sonic {
     c_synths.put(s_name,s);
   }
 
-  *removeObject {
+  *removeAt {
     arg name;
     var s;
     s = c_synths.at(name.asSymbol);
     s.set(\stop,0);
+  }
+
+  *setPos {
+    arg x,y;
+    c_x_bus.setSynchronous(x);
+    c_y_bus.setSynchronous(y);
+  }
+
+  *setAngle {
+    arg angle;
+    c_angle_bus.setSynchronous(angle);
   }
 }

@@ -1,5 +1,4 @@
 EE_Group {
-  classvar nb_outs = 4;
   var m_name;
   var m_g;
   var m_synths;
@@ -18,6 +17,8 @@ EE_Group {
     m_synths = ParGroup.new(m_g);
     m_effects = Group.after(m_synths);
     m_bus = Bus.audio(Sonic.c_server, bus_nb);
+    "Réservation de bus pour le groupe : ".post;
+    m_bus.postln;
   }
 
   free {
@@ -90,7 +91,7 @@ EE_Group_Spat : EE_Group {
   
   *new {
     arg name;
-    ^super.new(name,nb_outs).eegsInit; //<-- 4 bus
+    ^super.new(name,Sonic.c_nb_outs).eegsInit; //<-- 4 bus
   }
   
   eegsInit {
@@ -103,13 +104,13 @@ EE_Group_Spat : EE_Group {
   }
   
   playFile {
-    arg file, start, dur, s_name, s_synth, args = [];
+    arg file, start, dur, s_name, s_synth, x, y;
     var gr, syn, buf, bus, spat;
     buf = Buffer.read(Sonic.c_server, file.path, file.sampleRate * start, if(dur > 0,file.sampleRate * dur, -1),
 		      {gr = Group.new(m_synths);
-			bus = Bus.audio(Sonic.c_server, nb_outs);
-			spat = Synth.new(\spat, [\i_in, bus, \i_out, m_bus], gr);
-			syn = Synth.before(spat, s_synth, [\i_bufnum, buf, \i_out, m_bus, \i_fad, Sonic.c_fading] ++ args);
+			bus = Bus.audio(Sonic.c_server, 1); //<-- du playfile à la spat il n'y a qu'un bus
+			spat = Synth.new(\spat, [\i_in, bus, \i_out, m_bus, \x,Sonic.c_x_bus, \y,Sonic.c_y_bus, \angle,Sonic.c_angle_bus, \xo,x, \yo,y], gr);
+			syn = Synth.before(spat, s_synth, [\i_bufnum, buf, \i_out, bus, \i_fad, Sonic.c_fading] ++ args);
 			syn.onFree({buf.free; Sonic.c_synths.removeAt(s_name); gr.free; bus.free});
 			Sonic.c_synths.put(s_name, gr);});
     file.close;
@@ -118,17 +119,17 @@ EE_Group_Spat : EE_Group {
 
   playFileOnce {
     arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileOnceQuad, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
+    ^this.playFile(file, start, dur, s_name, \playFileOnceMono, if(dur > 0, [\i_bufdur, dur], [\i_bufdur, file.duration - start]));
   }
 
   playFileThisTime {
     arg file, start, dur, time, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileThisTimeQuad, [\i_time, time]);
+    ^this.playFile(file, start, dur, s_name, \playFileThisTimeMono, [\i_time, time]);
   }
 
   playFileLoop {
     arg file, start, dur, s_name;
-    ^this.playFile(file, start, dur, s_name, \playFileLoopQuad);
+    ^this.playFile(file, start, dur, s_name, \playFileLoopMono);
   }
 }
 
