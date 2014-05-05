@@ -10,7 +10,7 @@ Sonic {
   classvar <c_angle_bus;
 
   classvar <c_nb_outs = 4;
-    
+
 
   *sonInit {
     arg fad = 0.7;
@@ -78,6 +78,7 @@ Sonic {
   *playFile {
     arg s_name, filename, s_groupname = \ambiance, start = 0, dur = -1, to_spat=false, play_type;
     var g, f, ret;
+		("playfile :"+s_name+filename+s_groupname).postln;
     ret = this.prepareFileForPlay(s_name, filename, s_groupname, start, dur, to_spat);
     if (ret == false) {^false};
     g = ret[0]; f = ret[1];
@@ -87,17 +88,17 @@ Sonic {
   }
 
   *playFileThisTime {
-    arg name, filename, groupname, time, start = 0, dur = -1, to_spat = false, x, y;
+    arg name, filename, groupname, time, start = 0, dur = -1, to_spat = false, x=0, y=0;
     ^this.playFile(name.asSymbol,filename.asString, groupname.asSymbol, start, dur, to_spat.asBoolean, {|a,f| a.playFileThisTime(f, start, dur, time, name.asSymbol, x, y)});
   }
 
   *playFileOnce {
-    arg name, filename, groupname, start = 0, dur = -1, to_spat = false, x, y;
+    arg name, filename, groupname, start = 0, dur = -1, to_spat = false, x=0, y=0;
     ^this.playFile(name.asSymbol,filename.asString, groupname.asSymbol, start, dur, to_spat.asBoolean, {|a,f| a.playFileOnce(f, start, dur, name.asSymbol, x, y)});
   }
 
   *playFileLoop {
-    arg name, filename, groupname, start = 0, dur = -1, to_spat = false, x, y;
+    arg name, filename, groupname, start = 0, dur = -1, to_spat = false, x=0, y=0;
     ^this.playFile(name.asSymbol,filename.asString, groupname.asSymbol, start, dur, to_spat.asBoolean, {|a,f| a.playFileLoop(f, start, dur, name.asSymbol, x, y)});
   }
 
@@ -121,12 +122,12 @@ Sonic {
 
   *setPos {
     arg x,y;
-    c_x_bus.setSynchronous(x);
-    c_y_bus.setSynchronous(y);
+    c_x_bus.set(x);
+    c_y_bus.set(y);
   }
 
   *setAngle {
     arg angle;
-    c_angle_bus.setSynchronous(angle);
+    c_angle_bus.set(angle);
   }
 }

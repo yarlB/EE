@@ -9,7 +9,7 @@ EE_Group {
     arg name, bus_nb;
     ^super.new.eegInit(name, bus_nb);
   }
-  
+
   eegInit {
     arg name, bus_nb;
     m_name = name;
@@ -28,7 +28,7 @@ EE_Group {
     m_effects.free;
     m_bus.free;
     super.free;
-  }  
+  }
 }
 
 
@@ -57,14 +57,14 @@ EE_Group_NoSpat : EE_Group {
     allargs.postln;
     ^Synth.new(synth, allargs, m_synths);
   }
-  
+
   playFile {
     arg file, start, dur, s_name, s_synth, args = [];
     var syn, buf;
     buf = Buffer.read(Sonic.c_server, file.path, file.sampleRate * start, if(dur > 0,file.sampleRate * dur,-1),
 		      {syn = Synth(s_synth, [\i_bufnum, buf, \i_out, m_bus, \i_fad, Sonic.c_fading] ++ args, m_synths);
 			syn.onFree({buf.free; Sonic.c_synths.removeAt(s_name)});
-			Sonic.c_synths.put(s_name, syn);});		
+			Sonic.c_synths.put(s_name, syn);});
     file.close;
     ^true;
   }
@@ -88,28 +88,30 @@ EE_Group_NoSpat : EE_Group {
 
 EE_Group_Spat : EE_Group {
   var m_four2four;
-  
+
   *new {
     arg name;
     ^super.new(name,Sonic.c_nb_outs).eegsInit; //<-- 4 bus
   }
-  
+
   eegsInit {
+		("four2four :"+m_bus).postln;
     m_four2four = Synth.after(m_effects, \four2four,[\i_in,m_bus]);
   }
-  
+
   free {
     m_four2four.free;
     super.free;
   }
-  
+
   playFile {
     arg file, start, dur, s_name, s_synth, args = [], x, y;
     var gr, syn, buf, bus, spat;
     buf = Buffer.read(Sonic.c_server, file.path, file.sampleRate * start, if(dur > 0,file.sampleRate * dur, -1),
 		      {gr = Group.new(m_synths);
 			bus = Bus.audio(Sonic.c_server, 1); //<-- du playfile à la spat il n'y a qu'un bus
-			spat = Synth.new(\spat, [\i_in, bus, \i_out, m_bus, \x,Sonic.c_x_bus, \y,Sonic.c_y_bus, \angle,Sonic.c_angle_bus, \xo,x, \yo,y], gr);
+				("spat :"+bus+m_bus).postln;
+			spat = Synth.new(\spat, [\i_in, bus, \i_out, m_bus, \xb,Sonic.c_x_bus, \yb,Sonic.c_y_bus, \angleb,Sonic.c_angle_bus, \xo,x, \yo,y], gr);
 			syn = Synth.before(spat, s_synth, [\i_bufnum, buf, \i_out, bus, \i_fad, Sonic.c_fading] ++ args);
 			syn.onFree({buf.free; Sonic.c_synths.removeAt(s_name); gr.free; bus.free});
 			Sonic.c_synths.put(s_name, gr);});
@@ -127,28 +129,10 @@ EE_Group_Spat : EE_Group {
     ^this.playFile(file, start, dur, s_name, \playFileThisTimeMono, [\i_time, time], x, y);
   }
 
-  playFileLoop {
-    arg file, start, dur, s_name, x, y;
+	playFileLoop {
+		arg file, start, dur, s_name, x, y;
     ^this.playFile(file, start, dur, s_name, \playFileLoopMono, [], x, y);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
