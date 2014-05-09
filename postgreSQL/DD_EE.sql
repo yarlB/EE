@@ -76,8 +76,3 @@ CREATE FUNCTION pioche(p point) RETURNS TABLE(zones integer) AS $$
        SELECT id_zone FROM zones WHERE z @> p;
 $$ LANGUAGE SQL;
 
-
-DROP FUNCTION IF EXISTS proctest() CASCADE;
-CREATE FUNCTION proctest() RETURNS TABLE(trucs INTEGER) AS $$
-       SELECT id_zone FROM zones;
-$$ LANGUAGE SQL;
