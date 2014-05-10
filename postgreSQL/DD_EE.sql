@@ -24,7 +24,7 @@ CREATE TABLE zone_objets (
 );
 
 --CE QUI SUIT N'EST PAS UTILISABLE RIGHT NOW 
-
+/*
 DROP TABLE IF EXISTS substitutions CASCADE;
 CREATE TABLE substitutions (
        id_substitution SERIAL,
@@ -66,7 +66,7 @@ CREATE TABLE objet_preconds (
        REFERENCES preconditions(id_precondition)
 );
 
-
+*/
 
 
 -- DEFINIR volatilités minimums
