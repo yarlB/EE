@@ -2,7 +2,7 @@
 #define ZOU_INCL
 
 #include <pqxx/pqxx>
-#include "../trans/trans.hpp"
+#include "trans.hpp"
 
 #include <lo/lo.h>
 #include <lo/lo_cpp.h>

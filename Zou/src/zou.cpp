@@ -4,7 +4,7 @@
 
 #include "zou.hpp"
 
-#include "../globals/globals.hpp"
+#include "globals.hpp"
 
 extern std::string const dboptions;
 extern int const port;
