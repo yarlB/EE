@@ -26,6 +26,8 @@ CREATE TABLE placements (
        CONSTRAINT fk_placements_id_program FOREIGN KEY (id_program) REFERENCES programs(id_program)
 );
 
+/*
+
 -- DEFINIR volatilités minimums
 DROP FUNCTION IF EXISTS pioche(p point) CASCADE;
 CREATE FUNCTION pioche(p point) RETURNS TABLE (nom programs.nom%TYPE, prog programs.program) AS $$
@@ -56,7 +58,7 @@ $$ LANGUAGE plpgsql;
 
 UPDATE placements SET
 
-
+*/
 --CE QUI SUIT N'EST PAS UTILISABLE RIGHT NOW 
 /*
 DROP TABLE IF EXISTS substitutions CASCADE;
