@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include <cstdlib>
 
 #include "zou.hpp"
@@ -62,9 +61,9 @@ void Zou::loop() {
   TransOut t_out;
   m_loop = true;
   while(m_loop) {
-  m_pgcon.perform(Trans("SELECT pioche('(" + std::to_string(m_xGamer) + "," + std::to_string(m_yGamer) + ")')", t_out));
+    m_pgcon.perform(Trans("SELECT pioche('(" + std::to_string(m_xGamer) + "," + std::to_string(m_yGamer) + ")')", t_out));
   
-  processAll(t_out.m_result);
+    processAll(t_out.m_result);
   }
 }
 
@@ -72,8 +71,13 @@ void Zou::set_loop(boolean b) {
   m_loop = b;
 }
 
+//ligne résultat : (nom_programme, programme, nom_zone)
 void Zou::processAll(pqxx::result const& result) {
+  std::unordered_set<zonename_t> zones_names_tmp;
+
   for(pqxx::result::size_type i=0 ; i!=result.size() ; ++i) {
+    char * progname = result[i][0].c_str(), * program = result[i][1].c_str(), * zonename = result[i][2].c_str();
+    zones_names_tmp.insert(result[i][2].c_str());
     processProgram(result[i][0].c_str());
   }
 }

@@ -1,8 +1,12 @@
 #ifndef ZOU_INCL
 #define ZOU_INCL
 
+#include <string>
+#include <unordered_map>
+
 #include <pqxx/pqxx>
 #include "trans.hpp"
+#include "zone.hpp"
 
 #include <lo/lo.h>
 #include <lo/lo_cpp.h>
@@ -25,6 +29,8 @@ public:
 private:
   pqxx::connection m_pgcon;
   lo::ServerThread m_lo_st;
+
+  std::unordered_map<zonename_t,Zones> m_zones; //zones dans lesquelles le joueur se trouve.
 
   float m_xGamer;
   float m_yGamer;
