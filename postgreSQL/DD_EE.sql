@@ -17,9 +17,11 @@ CREATE TABLE programs (
 -- FAIRE index
 DROP TABLE IF EXISTS placements CASCADE;
 CREATE TABLE placements (
+       id_placement INTEGER,
        id_zone INTEGER,
        id_program INTEGER,
        trig BOOLEAN,
+       CONSTRAINT pk_placements PRIMARY KEY(id_placement),
        CONSTRAINT fk_placements_id_zone FOREIGN KEY (id_zone) REFERENCES zones(id_zone),
        CONSTRAINT fk_placements_id_program FOREIGN KEY (id_program) REFERENCES programs(id_program)
 );
@@ -37,6 +39,23 @@ BEGIN
        NATURAL JOIN (SELECT nom, program FROM objets) as objets;
 END;
 $$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS pioche(p point) CASCADE;
+CREATE FUNCTION pioche(p point) RETURNS TABLE (nom programs.nom%TYPE, prog programs.program) AS $$
+       WITH placements_aux AS (
+       	    (SELECT id_zone FROM zones WHERE z @> p) as zones_as
+	    	   NATURAL JOIN (SELECT id_zones, id_program FROM placements WHERE trig = false) as placements_as
+	    ), triggering AS (
+	           UPDATE placements SET trig = true WHERE id_placement IN placements_aux
+		   RETURNING *
+      	    )
+       	    SELECT * FROM triggering;
+       	    	   
+END;
+$$ LANGUAGE plpgsql;
+
+UPDATE placements SET
+
 
 --CE QUI SUIT N'EST PAS UTILISABLE RIGHT NOW 
 /*
