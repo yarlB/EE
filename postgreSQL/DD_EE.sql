@@ -27,17 +27,21 @@ CREATE TABLE placements (
 );
 
 
-CREATE FUNCTION truc(p POINT) RETURNS TABLE(nom programmes.nom%TYPE, programme programmes.programme%TYPE) AS $$
+DROP FUNCTION IF EXISTS pioche(p POINT) CASCADE;
+CREATE FUNCTION pioche(p POINT) RETURNS TABLE(nom_programme programmes.nom%TYPE, programme programmes.programme%TYPE, nom_zone zones.nom%TYPE) AS $$
 	WITH triggering AS (
-	     UPDATE placements SET trig = true WHERE id_placement IN (SELECT id_placement FROM (SELECT id_zone FROM zones WHERE z @> p) as zones_as
+	     UPDATE placements SET trig = true WHERE id_placement IN (SELECT id_placement FROM (SELECT id_zone, nom FROM zones WHERE z @> p) as zones_as
 	     NATURAL JOIN (SELECT id_zone, id_programme FROM placements WHERE trig = false) as placements_as)
 	     RETURNING *
 	     )
-	SELECT nom, programme FROM programmes NATURAL JOIN triggering;
+	SELECT programmes.nom, programmes.programme, zones.nom FROM programmes NATURAL JOIN triggering JOIN zones USING(id_zone);
 $$ LANGUAGE SQL;
 
 
-
+/*
+DROP FUNCTION IF EXISTS (p POINT) CASCADE;
+CREATE FUNCTION truc(p POINT) RETURNS TABLE
+*/
 
 --CE QUI SUIT N'EST PAS UTILISABLE RIGHT NOW 
 /*
