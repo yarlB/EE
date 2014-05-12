@@ -6,59 +6,39 @@ CREATE TABLE zones (
        CONSTRAINT pk_zones PRIMARY KEY (id_zone)
 );
 
-DROP TABLE IF EXISTS programs CASCADE;
-CREATE TABLE programs (
-       id_program SERIAL,
+DROP TABLE IF EXISTS programmes CASCADE;
+CREATE TABLE programmes (
+       id_programme SERIAL,
        nom VARCHAR(32),
-       program TEXT,
-       CONSTRAINT pk_programs PRIMARY KEY (id_program)
+       programme TEXT,
+       CONSTRAINT pk_programmes PRIMARY KEY (id_programme)
 );
 
 -- FAIRE index
 DROP TABLE IF EXISTS placements CASCADE;
 CREATE TABLE placements (
-       id_placement INTEGER,
+       id_placement SERIAL,
        id_zone INTEGER,
-       id_program INTEGER,
+       id_programme INTEGER,
        trig BOOLEAN,
        CONSTRAINT pk_placements PRIMARY KEY(id_placement),
        CONSTRAINT fk_placements_id_zone FOREIGN KEY (id_zone) REFERENCES zones(id_zone),
-       CONSTRAINT fk_placements_id_program FOREIGN KEY (id_program) REFERENCES programs(id_program)
+       CONSTRAINT fk_placements_id_programme FOREIGN KEY (id_programme) REFERENCES programmes(id_programme)
 );
 
-/*
 
--- DEFINIR volatilités minimums
-DROP FUNCTION IF EXISTS pioche(p point) CASCADE;
-CREATE FUNCTION pioche(p point) RETURNS TABLE (nom programs.nom%TYPE, prog programs.program) AS $$
-DECLARE
-    
-BEGIN
-       SELECT nom, program
-       FROM 
-       (SELECT id_zone FROM zones WHERE z @> p) as zones
-       NATURAL JOIN (SELECT id_zone, id_objet FROM zone_objets WHERE trig = false) as z_o
-       NATURAL JOIN (SELECT nom, program FROM objets) as objets;
-END;
-$$ LANGUAGE plpgsql;
+CREATE FUNCTION truc(p POINT) RETURNS TABLE(nom programmes.nom%TYPE, programme programmes.programme%TYPE) AS $$
+	WITH triggering AS (
+	     UPDATE placements SET trig = true WHERE id_placement IN (SELECT id_placement FROM (SELECT id_zone FROM zones WHERE z @> p) as zones_as
+	     NATURAL JOIN (SELECT id_zone, id_programme FROM placements WHERE trig = false) as placements_as)
+	     RETURNING *
+	     )
+	SELECT nom, programme FROM programmes NATURAL JOIN triggering;
+$$ LANGUAGE SQL;
 
-DROP FUNCTION IF EXISTS pioche(p point) CASCADE;
-CREATE FUNCTION pioche(p point) RETURNS TABLE (nom programs.nom%TYPE, prog programs.program) AS $$
-       WITH placements_aux AS (
-       	    (SELECT id_zone FROM zones WHERE z @> p) as zones_as
-	    	   NATURAL JOIN (SELECT id_zones, id_program FROM placements WHERE trig = false) as placements_as
-	    ), triggering AS (
-	           UPDATE placements SET trig = true WHERE id_placement IN placements_aux
-		   RETURNING *
-      	    )
-       	    SELECT * FROM triggering;
-       	    	   
-END;
-$$ LANGUAGE plpgsql;
 
-UPDATE placements SET
 
-*/
+
 --CE QUI SUIT N'EST PAS UTILISABLE RIGHT NOW 
 /*
 DROP TABLE IF EXISTS substitutions CASCADE;
