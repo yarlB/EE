@@ -21,8 +21,15 @@ int cb_lo_compas(char const* path, char const* types, lo_arg ** argv, int argc, 
   return 0;
 }
 
+/*
 int cb_lo_all(char const* path, char const* types, lo_arg ** argv, int argc, void* msg, void* zou) {
   std::cout << "prout" << std::endl;
+  return 0;
+}
+*/
+
+int cb_lo_stoploop(char const* path, char const* types, lo_arg ** argv, int argc, void* msg, void* zou) {
+  ((Zou*)zou)->set_loop(false);
   return 0;
 }
 
@@ -44,7 +51,7 @@ Zou::Zou(std::string const& s) : m_pgcon(s), m_lo_st(port) {
   m_lo_st.add_method("/position/position", "ff", cb_lo_position, (void*)this);
   m_lo_st.add_method("/position/compas", "ff", cb_lo_compas, (void*)this);
 
-  m_lo_st.add_method("/position/position","ff",cb_lo_all,NULL);
+  m_lo_st.add_method("/zou/stoploop","ff",cb_lo_stoploop,NULL);
 
   m_lo_st.start();
 }
@@ -53,11 +60,16 @@ Zou::~Zou() {m_pgcon.disconnect();}
 
 void Zou::loop() {
   TransOut t_out;
-  while(1);
-  //m_pgcon.perform(Trans("SELECT pioche('(" + std::to_string(m_xGamer) + "," + std::to_string(m_yGamer) + ")')", t_out));
+  m_loop = true;
+  while(m_loop) {
+  m_pgcon.perform(Trans("SELECT pioche('(" + std::to_string(m_xGamer) + "," + std::to_string(m_yGamer) + ")')", t_out));
   
-  //processAll(t_out.m_result);
-  
+  processAll(t_out.m_result);
+  }
+}
+
+void Zou::set_loop(boolean b) {
+  m_loop = b;
 }
 
 void Zou::processAll(pqxx::result const& result) {

@@ -14,6 +14,7 @@ public:
   ~Zou();
   
   void loop();
+  void set_loop(boolean);
 
   void processAll(pqxx::result const&);
   void processProgram(char const*);
@@ -28,6 +29,8 @@ private:
   float m_xGamer;
   float m_yGamer;
   float m_compasGamer;
+
+  boolean m_loop;
 };
 
 #endif //ZOU_INCL

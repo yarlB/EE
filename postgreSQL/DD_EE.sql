@@ -1,27 +1,42 @@
 DROP TABLE IF EXISTS zones CASCADE;
 CREATE TABLE zones (
        id_zone SERIAL,
-       nom VARCHAR(20),
+       nom VARCHAR(32),
        z BOX, 
        CONSTRAINT pk_zones PRIMARY KEY (id_zone)
 );
 
-DROP TABLE IF EXISTS objets CASCADE;
-CREATE TABLE objets (
-       id_objet SERIAL,
-       nom VARCHAR(20),
-       effet VARCHAR(50),
-       CONSTRAINT pk_objets PRIMARY KEY (id_objet)
+DROP TABLE IF EXISTS programs CASCADE;
+CREATE TABLE programs (
+       id_program SERIAL,
+       nom VARCHAR(32),
+       program TEXT,
+       CONSTRAINT pk_programs PRIMARY KEY (id_program)
 );
 
 -- FAIRE index
-DROP TABLE IF EXISTS zone_objets CASCADE;
-CREATE TABLE zone_objets (
+DROP TABLE IF EXISTS placements CASCADE;
+CREATE TABLE placements (
        id_zone INTEGER,
-       id_objet INTEGER,
-       CONSTRAINT fk_zone_objets_id_zone FOREIGN KEY (id_zone) REFERENCES zones(id_zone),
-       CONSTRAINT fk_zone_objets_id_objet FOREIGN KEY (id_objet) REFERENCES objets(id_objet)
+       id_program INTEGER,
+       trig BOOLEAN,
+       CONSTRAINT fk_placements_id_zone FOREIGN KEY (id_zone) REFERENCES zones(id_zone),
+       CONSTRAINT fk_placements_id_program FOREIGN KEY (id_program) REFERENCES programs(id_program)
 );
+
+-- DEFINIR volatilités minimums
+DROP FUNCTION IF EXISTS pioche(p point) CASCADE;
+CREATE FUNCTION pioche(p point) RETURNS TABLE (nom programs.nom%TYPE, prog programs.program) AS $$
+DECLARE
+    
+BEGIN
+       SELECT nom, program
+       FROM 
+       (SELECT id_zone FROM zones WHERE z @> p) as zones
+       NATURAL JOIN (SELECT id_zone, id_objet FROM zone_objets WHERE trig = false) as z_o
+       NATURAL JOIN (SELECT nom, program FROM objets) as objets;
+END;
+$$ LANGUAGE plpgsql;
 
 --CE QUI SUIT N'EST PAS UTILISABLE RIGHT NOW 
 /*
@@ -67,12 +82,4 @@ CREATE TABLE objet_preconds (
 );
 
 */
-
-
--- DEFINIR volatilités minimums
-
-DROP FUNCTION IF EXISTS pioche(p point) CASCADE;
-CREATE FUNCTION pioche(p point) RETURNS TABLE(zones integer) AS $$
-       SELECT id_zone FROM zones WHERE z @> p;
-$$ LANGUAGE SQL;
 
