@@ -1,15 +1,13 @@
 DROP TABLE IF EXISTS zones CASCADE;
 CREATE TABLE zones (
-       id_zone SERIAL,
-       nom VARCHAR(32),
+       id_zone VARCHAR(32),
        z BOX, 
        CONSTRAINT pk_zones PRIMARY KEY (id_zone)
 );
 
 DROP TABLE IF EXISTS programmes CASCADE;
 CREATE TABLE programmes (
-       id_programme SERIAL,
-       nom VARCHAR(32),
+       id_programme VARCHAR(32),
        programme TEXT,
        CONSTRAINT pk_programmes PRIMARY KEY (id_programme)
 );
