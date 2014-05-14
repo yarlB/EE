@@ -3,14 +3,20 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <pqxx/pqxx>
 #include "trans.hpp"
-#include "zone.hpp"
 
 #include <lo/lo.h>
 #include <lo/lo_cpp.h>
 
+typedef char const* fieldraw_t
+
+typedef std::string zonename_t;
+typedef std::string progname_t;
+typedef std::unordered_set<progname_t> progset_t;
+typedef std::unordered_map<zonename_t,progset_t> zonemap_t; 
 
 class Zou {
 public:
@@ -21,7 +27,7 @@ public:
   void set_loop(boolean);
 
   void processAll(pqxx::result const&);
-  void processProgram(char const*);
+  void processProgram(zonename_t &, field_raw_t);
 
   void setPositionGamer(float, float);
   void setCompasGamer(float);
@@ -30,7 +36,7 @@ private:
   pqxx::connection m_pgcon;
   lo::ServerThread m_lo_st;
 
-  std::unordered_map<zonename_t,Zones> m_zones; //zones dans lesquelles le joueur se trouve.
+  zonemap_t m_zones; //zones dans lesquelles le joueur se trouve.
 
   float m_xGamer;
   float m_yGamer;

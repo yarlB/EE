@@ -64,6 +64,7 @@ void Zou::loop() {
     m_pgcon.perform(Trans("SELECT pioche('(" + std::to_string(m_xGamer) + "," + std::to_string(m_yGamer) + ")')", t_out));
   
     processAll(t_out.m_result);
+    //pause (nanosleep?)
   }
 }
 
@@ -73,16 +74,26 @@ void Zou::set_loop(boolean b) {
 
 //ligne résultat : (nom_programme, programme, nom_zone)
 void Zou::processAll(pqxx::result const& result) {
-  std::unordered_set<zonename_t> zones_names_tmp;
+  std::unordered_set<char const*> zones_names_tmp;
 
   for(pqxx::result::size_type i=0 ; i!=result.size() ; ++i) {
-    char * progname = result[i][0].c_str(), * program = result[i][1].c_str(), * zonename = result[i][2].c_str();
-    zones_names_tmp.insert(result[i][2].c_str());
-    processProgram(result[i][0].c_str());
+    field_raw_t progname_raw = result[i][0].c_str(), program_raw = result[i][1].c_str(),
+      zonename_raw = result[i][2].c_str();
+    zonename_t zonename(zonename_raw);
+    zones_names_tmp.insert(zonename_raw);
+    progset_t hmm;
+    if(m_zones.count(zonename) == 0)
+      hmm = m_zones.insert(zonename, progset_t());
+    else
+      hmm = m_zones.find(zonename);
+    processProgram(hmm, program_raw);
   }
+
+  //envoi ordre de gelement des zones de m_zones pas dans zones_names_tmp;
+  //les zones gelées disparaissent (et tous leurs objets) au bout d'un certain temps
 }
 
-void Zou::processProgram(char const* program) {
+void Zou::processProgram(progset_t & zonename, field_raw_t program) {
   std::cout << program << std::endl;
 }
 
